@@ -10,12 +10,15 @@ import prisma from './lib/prisma';
 const app    = express();
 const server = createServer(app);
 
-const io = new SocketServer(server, {
-  cors: { origin: process.env.CLIENT_URL || 'http://localhost:3000', credentials: true },
-});
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
+  .split(',').map(o => o.trim());
+
+const corsOptions = { origin: allowedOrigins, credentials: true };
+
+const io = new SocketServer(server, { cors: corsOptions });
 
 app.set('trust proxy', 1);
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:3000', credentials: true }));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
